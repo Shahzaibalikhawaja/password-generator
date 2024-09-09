@@ -40,7 +40,7 @@ function App() {
 		<>
 			<div className="w-full flex-nowrap text-center max-w-md mx-auto shadow-md rounded-lg px-4 py-8 my-8 text-orange-500 bg-gray-800">
 				<h1 className="text-white text-center my-8">
-					Password Generator
+					Shaz's Password Generator
 				</h1>
 
 				<div className="flex shadow rounded-lg overflow-hidden mb-4">
