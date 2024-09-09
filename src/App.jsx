@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
@@ -8,13 +8,9 @@ function App() {
 	const [numberBoolean, setNumberBoolean] = useState(true);
 	const [characterBoolean, setCharacterBoolean] = useState(false);
 	const [password, setPassword] = useState("");
+	// useRef hook
+	const passwordRef = useRef(null); //null cuz no default value
 
-	//
-	// const passwordGenerator = (LENGTH = 8,NUM, CHAR)=>{
-	//   console.log("Generating Password...")
-	//   console.log("LENGTH:",LENGTH,"NUM:", NUM,"CHAR:", CHAR);
-
-	// }
 	const passwordGenerator = useCallback(() => {
 		let pass = "";
 
@@ -24,15 +20,21 @@ function App() {
 
 		for (let i = 1; i <= length; i++) {
 			let charr = Math.floor(Math.random() * characters.length + 1);
-      pass += characters.charAt(charr);
+			pass += characters.charAt(charr);
 		}
 
 		setPassword(pass);
-	}, [length, numberBoolean, characterBoolean, setPassword]);
+	}, [length, numberBoolean, characterBoolean, setPassword]); // useCallback k dependency array k elements mein jab bhi koi change aye to phr se optimize karta hai useCallback
 
-  useEffect(()=>{
-    passwordGenerator()
-  }, [length,numberBoolean,characterBoolean,passwordGenerator])
+	const copyPasswordToClipBoard = useCallback(() => {
+		passwordRef.current?.select(); // select/highlight text
+		passwordRef.current?.setSelectionRange(0, 65);
+		window.navigator.clipboard.writeText(password); // copy it to clipboard
+	}, [password]); //isko bhi optimize karte hain
+
+	useEffect(() => {
+		passwordGenerator();
+	}, [length, numberBoolean, characterBoolean, passwordGenerator]); // useEffect k dependency array k elements mein jab bhi koi change aye to phr se run karta hai poora function useEffect ak
 
 	return (
 		<>
@@ -48,16 +50,22 @@ function App() {
 						className="outline-none py-1 px-3 w-full"
 						placeholder="password"
 						readOnly
+						ref={passwordRef}
 					/>
 
-					<button>copy</button>
+					<button
+						className="outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0"
+						onClick={copyPasswordToClipBoard}
+					>
+						copy
+					</button>
 				</div>
 				<div className="flex text-sm gap-x-2">
 					<div className="flex items-center gap-x-1">
 						<input
 							type="range"
 							min={6}
-							max={50}
+							max={64}
 							value={length}
 							className="cursor-pointer"
 							onChange={(e) => {
@@ -75,7 +83,7 @@ function App() {
 								setNumberBoolean((prev) => !prev);
 							}}
 						/>
-            <label htmlFor="numberInput">Numbers?</label>
+						<label htmlFor="numberInput">Numbers?</label>
 					</div>
 					<div className="flex items-center gap-x-1">
 						<input
@@ -86,7 +94,7 @@ function App() {
 								setCharacterBoolean((prev) => !prev);
 							}}
 						/>
-            <label htmlFor="characterInput">Characters?</label>
+						<label htmlFor="characterInput">Characters?</label>
 					</div>
 				</div>
 			</div>
